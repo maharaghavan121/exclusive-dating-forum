@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kindred is the candid, thoughtfully curated community redefining modern dating through real conversations, insightful forums, and zero superficial swiping.">
+  <meta name="theme-color" content="#FAF7F2">
+  <title>Kindred — Modern Dating, Reimagined Through Real Conversation</title>
+  
+  <!-- Modern Google Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <!-- Ambient Audio Indicator / Sound Toggle -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="brand-logo" id="brand-home-btn" aria-label="Kindred Home">
+        <span class="logo-mark">✧</span>
+        <span class="logo-text">kindred</span>
+        <span class="logo-badge">beta</span>
+      </a>
+
+      <nav class="nav-links">
+        <button class="nav-link-btn" id="nav-manifesto-btn" type="button">Manifesto</button>
+        <button class="nav-link-btn" id="nav-community-btn" type="button">Forum Peek</button>
+        <button class="nav-link-btn" id="nav-faq-btn" type="button">FAQ</button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="sound-toggle-btn" id="sound-toggle-btn" title="Toggle audio feedback" aria-label="Toggle audio feedback">
+          <span class="sound-icon" id="sound-icon">🔊</span>
+          <span class="sound-text">Sound: On</span>
+        </button>
+        <button class="primary-btn sm header-cta" id="header-start-btn">Take the Quiz</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrapper" id="main-content">
+    
+    <!-- ==================== HERO / INTRO SECTION ==================== -->
+    <section class="screen-view active" id="hero-screen">
+      <div class="hero-content">
+        <div class="hero-pill">
+          <span class="hero-pill-sparkle">✦</span>
+          <span>The Anti-Swiping Movement</span>
+          <span class="hero-pill-divider">•</span>
+          <span class="hero-pill-members">2,480+ Founding Members Joined</span>
+        </div>
+
+        <h1 class="hero-title">
+          Dating is broken.<br>
+          <em class="serif-italic">Let's fix the conversation.</em>
+        </h1>
+
+        <p class="hero-subtitle">
+          Endless matching without substance is exhausting. Kindred is a private, curated forum & community built for intentional singles who value candid banter, real debates, and genuine chemistry over photo galleries.
+        </p>
+
+        <div class="hero-cta-group">
+          <button class="primary-btn lg pulse-animation" id="hero-start-btn">
+            <span>Discover Your Connection Archetype</span>
+            <span class="btn-arrow">→</span>
+          </button>
+          <div class="hero-meta-hint">
+            <span>⏱ 90-second vibe audit</span>
+            <span>•</span>
+            <span>🎟 Unlocks Founding Pass #</span>
+            <span>•</span>
+            <span>⌨️ Press <kbd class="kbd-hint">Enter ↵</kbd></span>
+          </div>
+        </div>
+
+        <!-- Interactive Value Props Grid -->
+        <div class="hero-features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>Conversations First</h3>
+            <p>Spark connections through spicy debates, anonymous confessions, and shared humor before faces.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Zero Creep Tolerance</h3>
+            <p>Peer-vetted membership, mutual opt-in DMs, and high-trust community standards.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">✨</div>
+            <h3>Archetype Matching</h3>
+            <p>Our algorithm pairs you with individuals who match your emotional depth and conversational rhythm.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== QUESTIONNAIRE SECTION ==================== -->
+    <section class="screen-view" id="quiz-screen">
+      <div class="quiz-container">
+        
+        <!-- Progress Bar & Navigation Header -->
+        <div class="quiz-top-bar">
+          <button class="back-btn" id="quiz-back-btn" aria-label="Go to previous step">
+            <span class="arrow-back">←</span>
+            <span>Back</span>
+          </button>
+          
+          <div class="quiz-progress-wrapper">
+            <div class="quiz-progress-text">
+              <span id="step-counter-text">Question 1 of 5</span>
+              <span class="progress-percent" id="progress-percent-text">20%</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20" id="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+          </div>
+
+          <div class="quiz-quick-skip">
+            <button class="text-btn" id="skip-quiz-btn">Skip to Results</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Questions Carousel Box -->
+        <div class="quiz-card-wrapper">
+          
+          <!-- QUESTION 1 -->
+          <div class="question-slide active" data-step="1">
+            <div class="question-meta-tag">Phase 01 • The Reality Check</div>
+            <h2 class="question-title">What is your single biggest frustration with modern dating apps?</h2>
+            <p class="question-desc">Pick the one that hits closest to home.</p>
+
+            <div class="options-grid">
+              <button class="option-btn" data-key="A" data-archetype="realist" data-value="superficial">
+                <span class="key-badge">A</span>
+                <span class="option-content">
+                  <strong class="option-title">Superficial swiping & photo obsession</strong>
+                  <span class="option-desc">Feels like an endless online catalog with zero soul or personality.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="B" data-archetype="conversationalist" data-value="penpals">
+                <span class="key-badge">B</span>
+                <span class="option-content">
+                  <strong class="option-title">The dreaded pen-pal loop & ghosting</strong>
+                  <span class="option-desc">Endless "hey how was your weekend" texts that never turn into real momentum.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="C" data-archetype="romantic" data-value="intentions">
+                <span class="key-badge">C</span>
+                <span class="option-content">
+                  <strong class="option-title">Lack of clear intentions & emotional games</strong>
+                  <span class="option-desc">People claiming they want something real while acting completely aloof.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="D" data-archetype="candid" data-value="bland">
+                <span class="key-badge">D</span>
+                <span class="option-content">
+                  <strong class="option-title">Boring, scripted first date small talk</strong>
+                  <span class="option-desc">Reciting resumes and talking about the weather instead of real passions.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+            </div>
+
+            <div class="keyboard-tip">
+              <span>Tip: Press <kbd>A</kbd>, <kbd>B</kbd>, <kbd>C</kbd>, or <kbd>D</kbd> on your keyboard</span>
+            </div>
+          </div>
+
+          <!-- QUESTION 2 -->
+          <div class="question-slide" data-step="2">
+            <div class="question-meta-tag">Phase 02 • The Burnout Meter</div>
+            <h2 class="question-title">On a scale of 1 to 10, how burnt out are you from swiping apps?</h2>
+            <p class="question-desc">Slide to set your honest exhaustion level.</p>
+
+            <div class="slider-container">
+              <div class="slider-meter-display">
+                <span class="meter-number" id="slider-val-display">8</span>
+                <span class="meter-emoji" id="slider-emoji-display">🤦‍♂️</span>
+                <div class="meter-status" id="slider-status-text">"Ready to throw my phone into the nearest body of water"</div>
+              </div>
+
+              <div class="slider-control-box">
+                <input type="range" min="1" max="10" value="8" class="custom-range-slider" id="burnout-slider" aria-label="Burnout slider">
+                <div class="slider-ticks">
+                  <span>1 (Chill)</span>
+                  <span>5 (Meh)</span>
+                  <span>10 (Over it)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-action-row">
+              <button class="primary-btn md" id="slider-continue-btn">
+                <span>Continue</span>
+                <span class="btn-arrow">→</span>
+              </button>
+              <span class="kbd-subtext">or press <kbd>Enter ↵</kbd></span>
+            </div>
+          </div>
+
+          <!-- QUESTION 3 -->
+          <div class="question-slide" data-step="3">
+            <div class="question-meta-tag">Phase 03 • The Vibe Filter</div>
+            <h2 class="question-title">What is an immediate "green flag" that makes you instantly lean in?</h2>
+            <p class="question-desc">What makes someone irresistibly attractive in conversation?</p>
+
+            <div class="options-grid">
+              <button class="option-btn" data-key="A" data-archetype="conversationalist" data-value="banter">
+                <span class="key-badge">A</span>
+                <span class="option-content">
+                  <strong class="option-title">Effortless banter & sharp, witty humor</strong>
+                  <span class="option-desc">Quick jokes, clever callbacks, and laughing until your stomach hurts.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="B" data-archetype="romantic" data-value="emotional_iq">
+                <span class="key-badge">B</span>
+                <span class="option-content">
+                  <strong class="option-title">Emotional self-awareness & vulnerability</strong>
+                  <span class="option-desc">Being articulate about feelings, boundaries, and what they care about.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="C" data-archetype="candid" data-value="candor">
+                <span class="key-badge">C</span>
+                <span class="option-content">
+                  <strong class="option-title">Zero mind games & refreshing transparency</strong>
+                  <span class="option-desc">Direct, respectful communication without three-day response games.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="D" data-archetype="realist" data-value="curiosity">
+                <span class="key-badge">D</span>
+                <span class="option-content">
+                  <strong class="option-title">Deep intellectual curiosity & passions</strong>
+                  <span class="option-desc">Getting wildly animated explaining something they genuinely love.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- QUESTION 4 -->
+          <div class="question-slide" data-step="4">
+            <div class="question-meta-tag">Phase 04 • The Community Test</div>
+            <h2 class="question-title">Which Kindred forum channels would you jump into first?</h2>
+            <p class="question-desc">Select 1 to 3 topics that pique your interest.</p>
+
+            <div class="chips-grid" id="topics-chips-grid">
+              <button class="chip-btn" type="button" data-topic="unpopular-opinions">
+                <span class="chip-emoji">🔥</span>
+                <span class="chip-label">Unpopular Dating Takes</span>
+                <span class="chip-state">+</span>
+              </button>
+
+              <button class="chip-btn" type="button" data-topic="blind-roast">
+                <span class="chip-emoji">🎭</span>
+                <span class="chip-label">Brutal Profile Audits</span>
+                <span class="chip-state">+</span>
+              </button>
+
+              <button class="chip-btn" type="button" data-topic="first-dates">
+                <span class="chip-emoji">🍷</span>
+                <span class="chip-label">First Date Post-Mortems</span>
+                <span class="chip-state">+</span>
+              </button>
+
+              <button class="chip-btn" type="button" data-topic="philosophical">
+                <span class="chip-emoji">🌙</span>
+                <span class="chip-label">2AM Deep Life Questions</span>
+                <span class="chip-state">+</span>
+              </button>
+
+              <button class="chip-btn" type="button" data-topic="speed-vibe">
+                <span class="chip-emoji">⚡</span>
+                <span class="chip-label">Blind Speed-Vibe Rounds</span>
+                <span class="chip-state">+</span>
+              </button>
+
+              <button class="chip-btn" type="button" data-topic="confessions">
+                <span class="chip-emoji">🤫</span>
+                <span class="chip-label">Anonymous Confessionals</span>
+                <span class="chip-state">+</span>
+              </button>
+
+              <button class="chip-btn" type="button" data-topic="green-flags">
+                <span class="chip-emoji">🌿</span>
+                <span class="chip-label">Underappreciated Green Flags</span>
+                <span class="chip-state">+</span>
+              </button>
+
+              <button class="chip-btn" type="button" data-topic="book-film-club">
+                <span class="chip-emoji">🎬</span>
+                <span class="chip-label">Taste Match & Media Swaps</span>
+                <span class="chip-state">+</span>
+              </button>
+            </div>
+
+            <div class="slide-action-row chips-footer">
+              <div class="selection-count-indicator">
+                Selected: <span id="chip-count-text">0</span> / 3
+              </div>
+              <button class="primary-btn md" id="chips-continue-btn" disabled>
+                <span>Continue</span>
+                <span class="btn-arrow">→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- QUESTION 5 -->
+          <div class="question-slide" data-step="5">
+            <div class="question-meta-tag">Phase 05 • The Connection Blueprint</div>
+            <h2 class="question-title">If you could change one golden rule of dating forever, what would it be?</h2>
+            <p class="question-desc">Your answer locks in your Founding Member Persona.</p>
+
+            <div class="options-grid">
+              <button class="option-btn" data-key="A" data-archetype="candid" data-value="honesty">
+                <span class="key-badge">A</span>
+                <span class="option-content">
+                  <strong class="option-title">Mandatory radical honesty</strong>
+                  <span class="option-desc">No polite faking; if you're not feeling it, say it with grace immediately.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="B" data-archetype="conversationalist" data-value="voice-first">
+                <span class="key-badge">B</span>
+                <span class="option-content">
+                  <strong class="option-title">Talk before you look</strong>
+                  <span class="option-desc">Connect over voice notes or written thoughts before viewing curated photos.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="C" data-archetype="romantic" data-value="effort">
+                <span class="key-badge">C</span>
+                <span class="option-content">
+                  <strong class="option-title">Bring back intentional romance & real dates</strong>
+                  <span class="option-desc">Meaningful planned outings instead of ambiguous "hanging out" invites.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+
+              <button class="option-btn" data-key="D" data-archetype="realist" data-value="community">
+                <span class="key-badge">D</span>
+                <span class="option-content">
+                  <strong class="option-title">Community introductions & peer validation</strong>
+                  <span class="option-desc">Meeting through friends-of-friends circles and shared community spheres.</span>
+                </span>
+                <span class="check-icon">✓</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== CALCULATION LOADER ==================== -->
+    <section class="screen-view" id="loading-screen">
+      <div class="loader-content">
+        <div class="spinner-ring">
+          <div class="spinner-core"></div>
+        </div>
+        <h2 class="loader-title" id="loader-status-text">Synthesizing your dating DNA...</h2>
+        <p class="loader-subtext" id="loader-sub-text">Mapping conversation resonance & forum compatibility</p>
+        <div class="loader-progress-track">
+          <div class="loader-progress-bar" id="loader-bar-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== RESULTS & PERSONA REVEAL ==================== -->
+    <section class="screen-view" id="results-screen">
+      <div class="results-container">
+        
+        <div class="results-header">
+          <div class="results-badge">✧ Your Connection Profile ✧</div>
+          <h2 class="results-headline">We found your people.</h2>
+          <p class="results-sub">Here is your verified Kindred archetype and exclusive Founding Member pass.</p>
+        </div>
+
+        <div class="results-dual-grid">
+          
+          <!-- LEFT: Dynamic Persona Card -->
+          <div class="persona-card" id="persona-card-element">
+            <div class="persona-card-header">
+              <div class="persona-tag">ARCHETYPE SPECIFICATION</div>
+              <div class="persona-compatibility">
+                <span class="comp-dot"></span>
+                <span>99.4% Kindred Match</span>
+              </div>
+            </div>
+
+            <div class="persona-avatar-wrapper">
+              <div class="persona-avatar" id="persona-avatar-icon">⚡</div>
+            </div>
+
+            <h3 class="persona-name" id="persona-name-text">The Candid Conversationalist</h3>
+            <p class="persona-tagline" id="persona-tagline-text">"Values razor-sharp wit, 2am philosophical deep dives, and zero tolerance for polite small talk."</p>
+
+            <div class="persona-traits-row">
+              <div class="trait-box">
+                <span class="trait-label">Superpower</span>
+                <strong class="trait-value" id="persona-superpower-text">Instant Chemistry Detection</strong>
+              </div>
+              <div class="trait-box">
+                <span class="trait-label">Dating Kryptonite</span>
+                <strong class="trait-value" id="persona-kryptonite-text">"K" & 3-word replies</strong>
+              </div>
+              <div class="trait-box">
+                <span class="trait-label">Best Forum Match</span>
+                <strong class="trait-value" id="persona-match-text">The Thoughtful Romantic</strong>
+              </div>
+            </div>
+
+            <div class="persona-dna-breakdown">
+              <div class="dna-item">
+                <div class="dna-label-row">
+                  <span>Conversational Depth</span>
+                  <span>96%</span>
+                </div>
+                <div class="dna-bar"><div class="dna-fill" style="width: 96%"></div></div>
+              </div>
+              <div class="dna-item">
+                <div class="dna-label-row">
+                  <span>Banter & Humor Agility</span>
+                  <span>92%</span>
+                </div>
+                <div class="dna-bar"><div class="dna-fill" style="width: 92%"></div></div>
+              </div>
+              <div class="dna-item">
+                <div class="dna-label-row">
+                  <span>Tolerance for BS</span>
+                  <span>14%</span>
+                </div>
+                <div class="dna-bar"><div class="dna-fill alert" style="width: 14%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Founding Pass & Waitlist Claim -->
+          <div class="claim-card">
+            
+            <!-- Pass Preview Box -->
+            <div class="founding-pass-ticket">
+              <div class="pass-glare"></div>
+              <div class="pass-top">
+                <div class="pass-brand">
+                  <span>✧ kindred</span>
+                  <span class="pass-type">FOUNDING COHORT</span>
+                </div>
+                <div class="pass-number" id="ticket-number-display">#KND-0941</div>
+              </div>
+              <div class="pass-body">
+                <div class="pass-holder-row">
+                  <div class="pass-field">
+                    <span class="pass-lbl">ISSUED TO</span>
+                    <strong class="pass-val" id="ticket-holder-display">Future Member</strong>
+                  </div>
+                  <div class="pass-field">
+                    <span class="pass-lbl">STATUS</span>
+                    <strong class="pass-val status-active">VIP Priority</strong>
+                  </div>
+                </div>
+                <div class="pass-perks-list">
+                  <span>✓ Private forum beta access</span>
+                  <span>✓ Guaranteed zero-algorithm matching</span>
+                  <span>✓ Verified Founding Badge on profile</span>
+                </div>
+              </div>
+              <div class="pass-footer">
+                <span class="pass-barcode">||| | |||| | ||||| || ||| |||| |</span>
+                <span class="pass-expiry">VALID FOR FALL 2026 ACCESS</span>
+              </div>
+            </div>
+
+            <!-- Waitlist Form Form -->
+            <div class="waitlist-form-wrapper" id="waitlist-form-container">
+              <h4 class="form-title">Claim Your Founding Pass & Reserved Handle</h4>
+              <p class="form-sub">We are onboarding in weekly batches of 150 members to preserve conversation quality.</p>
+              
+              <form class="waitlist-form" id="waitlist-form">
+                <div class="form-group">
+                  <label for="user-name-input">First Name or Handle</label>
+                  <input type="text" id="user-name-input" placeholder="e.g. Alex" required>
+                </div>
+                <div class="form-group">
+                  <label for="user-email-input">Your Best Email</label>
+                  <input type="email" id="user-email-input" placeholder="alex@example.com" required>
+                </div>
+                
+                <button type="submit" class="primary-btn lg full-width" id="claim-pass-btn">
+                  <span>Claim Founding Pass & Join Waitlist</span>
+                  <span class="btn-arrow">→</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Claimed State (Revealed after submit) -->
+            <div class="claimed-success-wrapper hidden" id="claimed-success-container">
+              <div class="success-icon-badge">🎉</div>
+              <h3>You're Officially On the List!</h3>
+              <p class="success-msg">Your Founding Pass has been reserved. You are <strong>#<span id="confirmed-rank">842</span></strong> in line for our private beta launch.</p>
+              
+              <div class="referral-box">
+                <label>Move up 25 spots for every friend who joins:</label>
+                <div class="referral-input-row">
+                  <input type="text" id="referral-link-input" readonly value="https://kindred.dating/join?ref=knd842">
+                  <button class="secondary-btn" id="copy-ref-btn">Copy Link</button>
+                </div>
+                <span class="copy-success-hint hidden" id="copy-hint">✓ Link copied to clipboard!</span>
+              </div>
+
+              <div class="share-actions">
+                <button class="social-share-btn" id="share-twitter-btn">Share on X / Twitter</button>
+                <button class="social-share-btn" id="share-whatsapp-btn">Share on WhatsApp</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== SNEAK PEEK FORUM SECTION ==================== -->
+    <section class="content-section" id="community-section">
+      <div class="section-container">
+        <div class="section-badge">Live Community Preview</div>
+        <h2 class="section-title">What real conversation looks like.</h2>
+        <p class="section-desc">No generic bios. No swipe bots. Just authentic, unfiltered discussions between intentional singles.</p>
+
+        <div class="forum-cards-grid">
+          
+          <!-- Forum Thread 1 -->
+          <div class="forum-thread-card">
+            <div class="thread-meta">
+              <span class="thread-category">🔥 Unpopular Opinions</span>
+              <span class="thread-time">24m ago</span>
+            </div>
+            <h4 class="thread-title">"Texting every day before a first date kills the romantic tension 90% of the time."</h4>
+            <p class="thread-excerpt">Save the banter for when you're actually sitting across each other with a drink. Constantly texting about how your Tuesday meeting went creates fake intimacy before you even know if you like their scent.</p>
+            
+            <div class="thread-interactive-poll">
+              <div class="poll-question">Do you agree?</div>
+              <div class="poll-buttons">
+                <button class="poll-btn" data-poll="agree">Agree (78%)</button>
+                <button class="poll-btn" data-poll="disagree">Disagree (22%)</button>
+              </div>
+            </div>
+
+            <div class="thread-footer">
+              <div class="author-chip">
+                <span class="author-avatar">🍸</span>
+                <span class="author-handle">@TheCandidCurator</span>
+              </div>
+              <div class="thread-stats">
+                <span>💬 142 replies</span>
+                <span>•</span>
+                <span>❤️ 489 likes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forum Thread 2 -->
+          <div class="forum-thread-card">
+            <div class="thread-meta">
+              <span class="thread-category">🌿 Green Flag Vault</span>
+              <span class="thread-time">1h ago</span>
+            </div>
+            <h4 class="thread-title">"When they ask a thoughtful follow-up question that proves they actually listened 20 minutes ago."</h4>
+            <p class="thread-excerpt">Mentioned offhand that my dog has an allergy to peanut butter. An hour later when looking at the dessert menu, they checked the ingredients before recommending a pastry. Instant heart eyes.</p>
+            
+            <div class="thread-footer">
+              <div class="author-chip">
+                <span class="author-avatar">📚</span>
+                <span class="author-handle">@BookishRomantic</span>
+              </div>
+              <div class="thread-stats">
+                <span>💬 88 replies</span>
+                <span>•</span>
+                <span>❤️ 612 likes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forum Thread 3 -->
+          <div class="forum-thread-card">
+            <div class="thread-meta">
+              <span class="thread-category">🤫 Anonymous Confessional</span>
+              <span class="thread-time">3h ago</span>
+            </div>
+            <h4 class="thread-title">"I deleted all traditional dating apps 6 months ago. Here's what nobody tells you about the peace."</h4>
+            <p class="thread-excerpt">Your self-esteem stops being tethered to whether an algorithmic notification pops up on your lock screen. Excited for Kindred because connection should feel like a cozy fireside salon, not a casino slot machine.</p>
+            
+            <div class="thread-footer">
+              <div class="author-chip">
+                <span class="author-avatar">🎭</span>
+                <span class="author-handle">@AnonymousMember</span>
+              </div>
+              <div class="thread-stats">
+                <span>💬 204 replies</span>
+                <span>•</span>
+                <span>❤️ 1,040 likes</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="section-cta-center">
+          <button class="primary-btn md" id="section-quiz-btn">Take the Vibe Quiz & Join the Beta →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MANIFESTO SECTION ==================== -->
+    <section class="content-section manifesto-bg" id="manifesto-section">
+      <div class="section-container narrow">
+        <div class="section-badge">The Kindred Manifesto</div>
+        <h2 class="manifesto-heading">Why we are ending the casino of swipes.</h2>
+        
+        <div class="manifesto-body">
+          <p class="lead-text">
+            Modern dating apps weren't designed to find you love. They were engineered like casino slot machines: maximize your screen time, feed your dopamine receptors with micro-validations, and keep you single so you keep paying monthly subscriptions.
+          </p>
+          <p>
+            The result is an epidemic of decision fatigue, ghosting culture, superficial judgments based on two-second photos, and meaningful connection reduced to disposable commodities.
+          </p>
+          <div class="manifesto-quote">
+            "Real attraction begins in the mind. It lives in how someone reasons, how they laugh, the questions they ask, and how they show up."
+          </div>
+          <p>
+            Kindred is built on an entirely different premise:
+          </p>
+          <ul class="manifesto-pillars">
+            <li><strong>Conversation over Catalogs:</strong> You meet through thoughts, stories, and shared interests before curated selfies.</li>
+            <li><strong>Zero Ghosting Norms:</strong> High-trust accountability and mutual respect built into the platform's social contract.</li>
+            <li><strong>Intimacy by Design:</strong> Curated local cohorts that transition from engaging digital forums to intimate real-world gatherings.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== FAQ SECTION ==================== -->
+    <section class="content-section" id="faq-section">
+      <div class="section-container narrow">
+        <div class="section-badge">Frequently Asked Questions</div>
+        <h2 class="section-title">Everything you need to know.</h2>
+
+        <div class="faq-accordion">
+          
+          <div class="faq-item">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>How does Kindred differ from apps like Hinge, Bumble, or Tinder?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-content">
+              <p>Kindred removes the endless left/right swiping mechanics. Instead of browsing isolated photo cards, you participate in curated community forums, blind conversation prompts, and thought-provoking debates. When two members resonate over ideas and banter, a private connection space unlocks.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>Is Kindred free to join?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-content">
+              <p>Founding Members who complete the early questionnaire and join the waitlist receive free lifetime Founding Status and early access to the private beta launch.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>How do you keep the community safe and high quality?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-content">
+              <p>We enforce human identity verification, mutual opt-in direct messages, community peer-moderation, and a strict zero-tolerance policy for unsolicited behavior or harassment.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-trigger" aria-expanded="false">
+              <span>When does the private beta launch?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-content">
+              <p>Cohort 1 rolls out in Fall 2026 for major metropolitan cities, followed by regional expansions based on waitlist density.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand-col">
+        <div class="brand-logo">
+          <span class="logo-mark">✧</span>
+          <span class="logo-text">kindred</span>
+        </div>
+        <p class="footer-tagline">Restoring humanity, wit, and candid conversation to modern romance.</p>
+      </div>
+
+      <div class="footer-links-col">
+        <h5>Explore</h5>
+        <a href="#hero-screen" id="foot-quiz-link">Take Vibe Quiz</a>
+        <a href="#manifesto-section" id="foot-manifesto-link">Our Manifesto</a>
+        <a href="#community-section" id="foot-community-link">Community Peek</a>
+        <a href="#faq-section" id="foot-faq-link">FAQ</a>
+      </div>
+
+      <div class="footer-bottom-row">
+        <p>© 2026 Kindred Dating Inc. All rights reserved.</p>
+        <div class="footer-social-links">
+          <span>Crafted with intentionality & curiosity.</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script src="app.js"></script>
+</body>
+</html>
