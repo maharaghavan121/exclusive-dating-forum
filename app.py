@@ -1,100 +1,34 @@
 #!/usr/bin/env python3
 """
-Exclusive Dating Forum – Interactive Planning & Brainstorming Platform
-Renders the complete 7-section document layout with interactive tables,
-checklists, and live editing.
+Kindred - Exclusive Dating Forum & Anti-Swiping Platform
+Clean landing page + interactive questionnaire matching the exact design aesthetic.
 Zero dependencies: python3 app.py
 """
 
 import http.server
 import json
 import os
+import random
 import socketserver
+import time
 import urllib.parse
 from http import HTTPStatus
 
 PORT = int(os.environ.get("PORT", 8080))
-DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
-
-DEFAULT_DATA = {
-    "organizer": "Mahalakshmi",
-    "target_timeline": "September 2026",
-    "status": "Brainstorming & Planning",
-    "cohort_size": "20 Guests (10 Women, 10 Men)",
-    "overview": {
-        "premise": "An intentionally curated, private dating forum bringing together 20 friends (10 women and 10 men) in interactive, low-pressure group settings.",
-        "philosophy": "Foster organic connections through shared activities and natural conversation facilitation rather than high-pressure traditional dating setups.",
-        "format": "A curated event built around engaging group activities where participants collaborate, compete, and interact in varying group dynamics."
-    },
-    "guest_list": [
-        {"id": "W1", "name": "Sarah J.", "gender": "Female", "connection": "College Friend", "notes": "Foodie, loves cooking, beginner pickleball", "rsvp": "Confirmed"},
-        {"id": "W2", "name": "Elena R.", "gender": "Female", "connection": "Work Colleague", "notes": "Outdoor enthusiast, adventurous", "rsvp": "Confirmed"},
-        {"id": "W3", "name": "Maya P.", "gender": "Female", "connection": "Mutual Friend (Alex)", "notes": "Product designer, plays tennis", "rsvp": "Confirmed"},
-        {"id": "W4", "name": "Chloe T.", "gender": "Female", "connection": "High School Friend", "notes": "Bakes sourdough, super outgoing", "rsvp": "Confirmed"},
-        {"id": "W5", "name": "Jessica K.", "gender": "Female", "connection": "Running Club", "notes": "Marathoner, tech PM", "rsvp": "Invited"},
-        {"id": "W6", "name": "Amina D.", "gender": "Female", "connection": "Book Club", "notes": "Creative writer, coffee lover", "rsvp": "Invited"},
-        {"id": "W7", "name": "Rachel B.", "gender": "Female", "connection": "Mutual Friend (Samir)", "notes": "Architect, loves live music", "rsvp": "Invited"},
-        {"id": "W8", "name": "Hannah L.", "gender": "Female", "connection": "Gym Friend", "notes": "Dog mom, great conversationalist", "rsvp": "Invited"},
-        {"id": "W9", "name": "Tara M.", "gender": "Female", "connection": "Referred by David", "notes": "Consultant, travels often", "rsvp": "Invited"},
-        {"id": "W10", "name": "Nina W.", "gender": "Female", "connection": "College Friend", "notes": "Loves board games & wine nights", "rsvp": "Invited"},
-        {"id": "M1", "name": "David K.", "gender": "Male", "connection": "High School Friend", "notes": "Software eng, plays pickleball regularly", "rsvp": "Confirmed"},
-        {"id": "M2", "name": "Alex M.", "gender": "Male", "connection": "College Friend", "notes": "Passionate home cook, pizza enthusiast", "rsvp": "Confirmed"},
-        {"id": "M3", "name": "Marcus C.", "gender": "Male", "connection": "Gym Buddy", "notes": "Upbeat energy, marathon runner", "rsvp": "Confirmed"},
-        {"id": "M4", "name": "Samir G.", "gender": "Male", "connection": "Work Colleague", "notes": "Design director, cocktail enthusiast", "rsvp": "Confirmed"},
-        {"id": "M5", "name": "Liam H.", "gender": "Male", "connection": "Music Circle", "notes": "Guitarist & tech consultant", "rsvp": "Invited"},
-        {"id": "M6", "name": "Julian B.", "gender": "Male", "connection": "Mutual Friend (Elena)", "notes": "Easygoing, loves hiking & dining out", "rsvp": "Invited"},
-        {"id": "M7", "name": "Daniel F.", "gender": "Male", "connection": "Architecture Friend", "notes": "Art & design lover, foodie", "rsvp": "Invited"},
-        {"id": "M8", "name": "Rohan S.", "gender": "Male", "connection": "Climbing Gym", "notes": "Startup founder, loves trivia", "rsvp": "Invited"},
-        {"id": "M9", "name": "Kevin Z.", "gender": "Male", "connection": "Referred by Marcus", "notes": "Competitive cook, funny vibe", "rsvp": "Invited"},
-        {"id": "M10", "name": "Ethan N.", "gender": "Male", "connection": "College Friend", "notes": "Data scientist, craft beer fan", "rsvp": "Invited"}
-    ],
-    "activities": [
-        {
-            "name": "Pickleball Social & Tournament",
-            "venue": "Local courts / indoor racquet club",
-            "structure": "Rotating mixed doubles pairs (1M + 1W)",
-            "cost": "$15 – $25 / person",
-            "pros": "High energy, fast icebreaker, effortless partner rotations",
-            "cons": "Athletic ability differences, weather dependent (if outdoors)"
-        },
-        {
-            "name": "Pizza Making Night",
-            "venue": "Home kitchen with outdoor oven / rented culinary studio",
-            "structure": "4 prep stations (5 people per station: 2-3M / 2-3W)",
-            "cost": "$25 – $35 / person",
-            "pros": "Relaxed collaborative cooking, shared family-style meal",
-            "cons": "Requires sufficient oven and counter prep space"
-        },
-        {
-            "name": "Cooking Competition (Cook-Off)",
-            "venue": "Rented commercial kitchen / large private residence",
-            "structure": "4 teams of 5 with mystery ingredient challenge",
-            "cost": "$30 – $45 / person",
-            "pros": "High team bonding, fun friendly judging and tasting",
-            "cons": "More ingredient prep and cleanup coordination"
-        }
-    ],
-    "checklist": [
-        {"text": "Event Format Decision: Confirm inaugural activity (Pickleball vs. Pizza vs. Cook-off)", "checked": False},
-        {"text": "Date & Venue: Finalize target date, time, and reserve space", "checked": False},
-        {"text": "Target Guest List: Send private invites to the 10 women & 10 men + have 2 alternates each", "checked": False},
-        {"text": "Budget & Expenses: Determine cost split method (host-covered vs. per-person ticket)", "checked": False},
-        {"text": "Post-Event Matchmaking: Decide between double-blind mutual match check-in or shared group directory", "checked": False}
-    ]
-}
+DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "submissions.json")
 
 
-def load_data():
+def load_submissions():
     if os.path.exists(DATA_FILE):
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
-            return DEFAULT_DATA
-    return DEFAULT_DATA
+            return []
+    return []
 
 
-def save_data(data):
+def save_submissions(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
@@ -104,380 +38,545 @@ HTML_PAGE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exclusive Dating Forum – Planning & Brainstorming</title>
+  <title>kindred — Dating is broken. Let's fix the conversation.</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600;1,700;1,800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .doc-container { max-width: 900px; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #FAF7F2;
+      color: #191817;
+    }
+    .font-serif-italic {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      color: #C85A32;
+    }
+    .card-shadow {
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+    .quiz-option:hover {
+      border-color: #C85A32;
+      background-color: #FDF9F5;
+    }
+    .quiz-option.selected {
+      border-color: #C85A32;
+      background-color: #FDF3EC;
+    }
+    .fade-in {
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
-<body class="bg-[#f8f9fa] text-slate-800 antialiased min-h-screen py-10 px-4">
+<body class="min-h-screen flex flex-col justify-between selection:bg-[#F3D7C8] selection:text-[#933718]">
 
-  <!-- Main Document Container -->
-  <div class="doc-container mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sm:p-14 space-y-10">
-
-    <!-- Header / Title Block -->
-    <div class="border-b border-slate-100 pb-8 space-y-4">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <span class="px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100">
-          Planning & Brainstorming Framework
-        </span>
-        <button onclick="saveAll()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2">
-          <span>💾 Save All Changes</span>
-        </button>
-      </div>
-
-      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-        Exclusive Dating Forum – Planning & Brainstorming
-      </h1>
-
-      <!-- Metadata Line -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
-        <div>
-          <span class="font-bold text-slate-400 block uppercase text-[10px]">Organizer</span>
-          <input type="text" id="metaOrganizer" class="bg-transparent font-semibold text-slate-800 focus:outline-none w-full">
-        </div>
-        <div>
-          <span class="font-bold text-slate-400 block uppercase text-[10px]">Target Timeline</span>
-          <input type="text" id="metaTimeline" class="bg-transparent font-semibold text-slate-800 focus:outline-none w-full">
-        </div>
-        <div>
-          <span class="font-bold text-slate-400 block uppercase text-[10px]">Status</span>
-          <span class="font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Brainstorming</span>
-        </div>
-        <div>
-          <span class="font-bold text-slate-400 block uppercase text-[10px]">Cohort Size</span>
-          <span class="font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">20 (10W / 10M)</span>
-        </div>
-      </div>
+  <!-- Top Navigation -->
+  <header class="w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+    <div class="flex items-center gap-2 cursor-pointer" onclick="goToHome()">
+      <span class="text-[#C85A32] text-xl font-bold">✦</span>
+      <span class="text-xl font-extrabold tracking-tight text-[#191817]">kindred</span>
+      <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#ECE7DE] text-[#6B655B]">BETA</span>
     </div>
 
-    <!-- 1. OVERVIEW & CORE CONCEPT -->
-    <section class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">1</span>
-        <h2 class="text-xl font-bold text-slate-900">Overview & Core Concept</h2>
-      </div>
+    <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#6B655B]">
+      <a href="javascript:void(0)" onclick="openModal('manifesto')" class="hover:text-[#191817] transition">Manifesto</a>
+      <a href="javascript:void(0)" onclick="openModal('forumPeek')" class="hover:text-[#191817] transition">Forum Peek</a>
+      <a href="javascript:void(0)" onclick="openModal('faq')" class="hover:text-[#191817] transition">FAQ</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <button id="soundToggle" onclick="toggleSound()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#ECE7DE] text-[#554F45] hover:bg-[#E3DDD2] transition">
+        <span id="soundIcon">🔊</span>
+        <span>Sound: <span id="soundStatus">On</span></span>
+      </button>
+      <button onclick="startQuiz()" class="px-5 py-2 rounded-full text-xs font-bold bg-[#191817] text-white hover:bg-black transition shadow-sm">
+        Take the Quiz
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main id="mainContainer" class="w-full max-w-4xl mx-auto px-6 py-10 flex-1 flex flex-col justify-center">
+
+    <!-- VIEW 1: HERO LANDING PAGE -->
+    <div id="landingView" class="text-center space-y-8 fade-in">
       
-      <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-5 space-y-3 text-sm text-slate-700 leading-relaxed">
-        <p><strong>• Premise:</strong> An intentionally curated, private dating forum bringing together 20 friends (10 women and 10 men) in interactive, low-pressure group settings.</p>
-        <p><strong>• Core Philosophy:</strong> Foster organic connections through shared activities and natural conversation facilitation rather than high-pressure traditional dating setups.</p>
-        <p><strong>• Format:</strong> A curated event (or series of events) built around engaging group activities where participants collaborate, compete, and interact in varying group dynamics.</p>
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E8E2D8] text-xs font-medium shadow-sm">
+        <span class="text-[#C85A32]">✦</span>
+        <span class="text-[#191817] font-semibold">The Anti-Swiping Movement</span>
+        <span class="text-[#999]">•</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+        <span class="text-emerald-700 font-bold">2,480+ Founding Members Joined</span>
       </div>
-    </section>
 
-    <!-- 2. GUEST LIST & COHORT SELECTION -->
-    <section class="space-y-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">2</span>
-          <h2 class="text-xl font-bold text-slate-900">Guest List Tracker (10 Women / 10 Men)</h2>
-        </div>
-        <div class="flex gap-2">
-          <span id="womenCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-pink-50 text-pink-700 border border-pink-100">0/10 Women</span>
-          <span id="menCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-100">0/10 Men</span>
+      <div class="space-y-1">
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#191817]">
+          Dating is broken.
+        </h1>
+        <div class="text-4xl sm:text-5xl md:text-6xl font-serif-italic font-bold tracking-tight">
+          Let's fix the conversation.
         </div>
       </div>
 
-      <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
-              <th class="py-3 px-3 w-10 text-center">#</th>
-              <th class="py-3 px-3">Guest Name</th>
-              <th class="py-3 px-3 w-20">Gender</th>
-              <th class="py-3 px-3">Mutual Connection / Referrer</th>
-              <th class="py-3 px-3">Notes & Interests</th>
-              <th class="py-3 px-3 w-28">RSVP Status</th>
-            </tr>
-          </thead>
-          <tbody id="guestTableBody" class="divide-y divide-slate-100 text-slate-700">
-          </tbody>
-        </table>
-      </div>
-    </section>
+      <p class="max-w-2xl mx-auto text-[#666055] text-base sm:text-lg leading-relaxed">
+        Endless matching without substance is exhausting. Kindred is a private, curated forum & community built for intentional singles who value candid banter, real debates, and genuine chemistry over photo galleries.
+      </p>
 
-    <!-- 3. EVENT SERIES & ACTIVITY FORMATS -->
-    <section class="space-y-6">
-      <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">3</span>
-        <h2 class="text-xl font-bold text-slate-900">Event Series & Activity Formats</h2>
-      </div>
+      <div class="pt-2 space-y-3">
+        <button onclick="startQuiz()" class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#191817] hover:bg-black text-white text-base font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+          <span>Discover Your Connection Archetype</span>
+          <span>→</span>
+        </button>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-5 rounded-xl border border-emerald-100 bg-emerald-50/40 space-y-2">
-          <div class="text-emerald-700 font-bold text-sm flex items-center gap-2">
-            <span>🎾</span> Option A: Pickleball Social
-          </div>
-          <p class="text-xs text-slate-600"><strong>Format:</strong> Round-robin doubles with partner rotations across rounds.</p>
-          <p class="text-xs text-slate-600"><strong>Dynamic:</strong> Fast-paced, high energy, natural icebreaker.</p>
-        </div>
-
-        <div class="p-5 rounded-xl border border-amber-100 bg-amber-50/40 space-y-2">
-          <div class="text-amber-700 font-bold text-sm flex items-center gap-2">
-            <span>🍕</span> Option B: Pizza Making Night
-          </div>
-          <p class="text-xs text-slate-600"><strong>Format:</strong> Small teams/pairs working together at prep stations making custom pizzas.</p>
-          <p class="text-xs text-slate-600"><strong>Dynamic:</strong> Creative, collaborative, hands-on conversation.</p>
-        </div>
-
-        <div class="p-5 rounded-xl border border-rose-100 bg-rose-50/40 space-y-2">
-          <div class="text-rose-700 font-bold text-sm flex items-center gap-2">
-            <span>🍳</span> Option C: Cooking Cook-Off
-          </div>
-          <p class="text-xs text-slate-600"><strong>Format:</strong> Timed cook-off in teams with mystery ingredients & judging.</p>
-          <p class="text-xs text-slate-600"><strong>Dynamic:</strong> High team bonding, friendly competition & tasting.</p>
+        <div class="flex flex-wrap items-center justify-center gap-3 text-xs text-[#8A8478] pt-2">
+          <span>⏱ 90-second vibe audit</span>
+          <span>•</span>
+          <span>🎟 Unlocks Founding Pass #</span>
+          <span>•</span>
+          <span class="inline-flex items-center gap-1 bg-[#ECE7DE] px-2 py-0.5 rounded text-[11px] font-mono text-[#554F45]">Press <b class="font-sans font-bold">Enter ↵</b></span>
         </div>
       </div>
 
-      <!-- Activity Comparison Matrix -->
-      <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
-              <th class="py-3 px-3">Activity Option</th>
-              <th class="py-3 px-3">Target Venue Type</th>
-              <th class="py-3 px-3">Team Structure</th>
-              <th class="py-3 px-3">Est. Cost</th>
-              <th class="py-3 px-3">Pros</th>
-              <th class="py-3 px-3">Cons / Challenges</th>
-            </tr>
-          </thead>
-          <tbody id="activityTableBody" class="divide-y divide-slate-100 text-slate-700">
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- 4. CONVERSATION FACILITATION & EVENT FLOW -->
-    <section class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">4</span>
-        <h2 class="text-xl font-bold text-slate-900">Conversation Facilitation & Event Flow</h2>
-      </div>
-
-      <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
-              <th class="py-3 px-3 w-28">Time Window</th>
-              <th class="py-3 px-3 w-40">Segment</th>
-              <th class="py-3 px-3">Objective & Activity</th>
-              <th class="py-3 px-3">Facilitation Notes</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 text-slate-700">
-            <tr>
-              <td class="py-3 px-3 font-bold text-indigo-600">0:00 – 0:30</td>
-              <td class="py-3 px-3 font-semibold">Welcome & Mingling</td>
-              <td class="py-3 px-3">Casual drinks, name tags, arrivals</td>
-              <td class="py-3 px-3 text-slate-500">Host welcome speech & setting expectations</td>
-            </tr>
-            <tr>
-              <td class="py-3 px-3 font-bold text-indigo-600">0:30 – 1:30</td>
-              <td class="py-3 px-3 font-semibold">Main Activity (Part 1)</td>
-              <td class="py-3 px-3">Structured activity / first set of rotations</td>
-              <td class="py-3 px-3 text-slate-500">Keep rounds timed and partner transitions smooth</td>
-            </tr>
-            <tr>
-              <td class="py-3 px-3 font-bold text-indigo-600">1:30 – 2:00</td>
-              <td class="py-3 px-3 font-semibold">Half-Time / Break</td>
-              <td class="py-3 px-3">Food, snacks, casual regrouping</td>
-              <td class="py-3 px-3 text-slate-500">Natural conversation pause and drink refill</td>
-            </tr>
-            <tr>
-              <td class="py-3 px-3 font-bold text-indigo-600">2:00 – 3:00</td>
-              <td class="py-3 px-3 font-semibold">Main Activity (Part 2)</td>
-              <td class="py-3 px-3">Second round / finals / tasting & judging</td>
-              <td class="py-3 px-3 text-slate-500">Re-shuffle groups for brand new interactions</td>
-            </tr>
-            <tr>
-              <td class="py-3 px-3 font-bold text-indigo-600">3:00 – End</td>
-              <td class="py-3 px-3 font-semibold">Wrap-Up & Open Hangout</td>
-              <td class="py-3 px-3">Dessert, drinks, unstructured mingling</td>
-              <td class="py-3 px-3 text-slate-500">Zero pressure, voluntary stay</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- 5. OPERATIONS & LOGISTICS -->
-    <section class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">5</span>
-        <h2 class="text-xl font-bold text-slate-900">Operations & Logistics</h2>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
-        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-2">
-          <h3 class="font-bold text-slate-900 text-sm">📍 Venue Planning</h3>
-          <p>• <strong>Options:</strong> Private home, rented studio, community court, culinary space.</p>
-          <p>• <strong>Capacity:</strong> Comfortable seating for 20, kitchen facilities, sound system, parking.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-10 text-left">
+        
+        <div class="bg-white p-7 rounded-2xl border border-[#ECE7DE] card-shadow space-y-3 hover:border-[#D9CFBF] transition">
+          <div class="w-9 h-9 rounded-xl bg-[#FAF7F2] text-xl flex items-center justify-center">💬</div>
+          <h3 class="font-bold text-base text-[#191817]">Conversations First</h3>
+          <p class="text-xs text-[#6B655B] leading-relaxed">
+            Spark connections through spicy debates, anonymous confessions, and shared humor before faces.
+          </p>
         </div>
-        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-2">
-          <h3 class="font-bold text-slate-900 text-sm">💵 Budget & Expenses (Est. $400 – $850)</h3>
-          <p>• <strong>Venue Rental:</strong> $100 – $300</p>
-          <p>• <strong>Food & Drinks:</strong> $250 – $450 ($20 – $40 / person)</p>
-          <p>• <strong>Cost Model:</strong> Split evenly or host-subsidized.</p>
+
+        <div class="bg-white p-7 rounded-2xl border border-[#ECE7DE] card-shadow space-y-3 hover:border-[#D9CFBF] transition">
+          <div class="w-9 h-9 rounded-xl bg-[#FAF7F2] text-xl flex items-center justify-center">🛡️</div>
+          <h3 class="font-bold text-base text-[#191817]">Zero Creep Tolerance</h3>
+          <p class="text-xs text-[#6B655B] leading-relaxed">
+            Peer-vetted membership, mutual opt-in DMs, and high-trust community standards.
+          </p>
         </div>
-      </div>
-    </section>
 
-    <!-- 6. POST-EVENT FACILITATION -->
-    <section class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">6</span>
-        <h2 class="text-xl font-bold text-slate-900">Post-Event Connection Facilitation</h2>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-          <h4 class="font-bold text-slate-900">Option 1: Double-Blind Mutual Match</h4>
-          <p class="text-slate-600">Guests privately text the host the names of people they'd like to see again. Host connects mutual matches.</p>
+        <div class="bg-white p-7 rounded-2xl border border-[#ECE7DE] card-shadow space-y-3 hover:border-[#D9CFBF] transition">
+          <div class="w-9 h-9 rounded-xl bg-[#FAF7F2] text-xl flex items-center justify-center">✨</div>
+          <h3 class="font-bold text-base text-[#191817]">Archetype Matching</h3>
+          <p class="text-xs text-[#6B655B] leading-relaxed">
+            Our algorithm pairs you with individuals who match your emotional depth and conversational rhythm.
+          </p>
         </div>
-        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-          <h4 class="font-bold text-slate-900">Option 2: Open Group Chat</h4>
-          <p class="text-slate-600">Shared group chat / IG directory for everyone to follow up and plan organic meetups.</p>
-        </div>
-        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-          <h4 class="font-bold text-slate-900">Option 3: Host 1-on-1 Check-In</h4>
-          <p class="text-slate-600">Host chats with attendees individually post-event for feedback and warm introductions.</p>
-        </div>
-      </div>
-    </section>
 
-    <!-- 7. BRAINSTORMING SCRATCHPAD & DECISIONS -->
-    <section class="space-y-4 border-t border-slate-100 pt-8">
-      <div class="flex items-center gap-3">
-        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">7</span>
-        <h2 class="text-xl font-bold text-slate-900">Brainstorming Scratchpad & Open Decisions</h2>
       </div>
 
-      <div id="checklistContainer" class="space-y-2 bg-slate-50 p-5 rounded-xl border border-slate-200 text-xs">
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <div class="text-center pt-8 border-t border-slate-100 text-xs text-slate-400">
-      Exclusive Dating Forum • 20-Person Planning Framework
     </div>
 
+    <!-- VIEW 2: INTERACTIVE QUESTIONNAIRE -->
+    <div id="quizView" class="hidden max-w-2xl mx-auto w-full space-y-8 fade-in">
+      <div class="space-y-2">
+        <div class="flex justify-between text-xs font-semibold text-[#8A8478]">
+          <span id="quizStepIndicator">Question 1 of 5</span>
+          <span id="quizPercent">20% Completed</span>
+        </div>
+        <div class="w-full h-1.5 bg-[#E8E2D8] rounded-full overflow-hidden">
+          <div id="quizProgressBar" class="h-full bg-[#C85A32] rounded-full transition-all duration-300 w-1/5"></div>
+        </div>
+      </div>
+
+      <div id="questionContainer" class="bg-white p-8 sm:p-10 rounded-3xl border border-[#ECE7DE] card-shadow space-y-6">
+      </div>
+    </div>
+
+    <!-- VIEW 3: FOUNDING PASS REVEAL -->
+    <div id="resultView" class="hidden max-w-lg mx-auto w-full space-y-6 fade-in text-center">
+      <div class="bg-white p-8 sm:p-10 rounded-3xl border-2 border-[#C85A32] card-shadow space-y-6 relative overflow-hidden">
+        <div class="absolute -right-8 -top-8 text-9xl text-[#FDF3EC] font-serif select-none pointer-events-none">✦</div>
+        
+        <div class="space-y-2">
+          <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#FDF3EC] text-[#C85A32]">
+            Vibe Audit Verified
+          </span>
+          <h2 class="text-3xl font-extrabold text-[#191817]" id="resultArchetype">The Witty Strategist</h2>
+          <p class="text-xs text-[#6B655B]" id="resultDesc">You thrive in dynamic environments with high banter, playful debate, and authentic chemistry.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-[#191817] text-white text-left space-y-4 relative shadow-lg">
+          <div class="flex justify-between items-start border-b border-neutral-800 pb-3">
+            <div>
+              <div class="text-[10px] font-mono tracking-widest text-[#C85A32] uppercase font-bold">KINDRED FOUNDING PASS</div>
+              <div class="text-xl font-bold tracking-tight text-white" id="passHolderName">Alex M.</div>
+            </div>
+            <span class="text-2xl text-[#C85A32]">✦</span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <span class="text-neutral-400 block text-[10px] uppercase">Cohort Format</span>
+              <span class="font-bold text-white">20-Friend Forum</span>
+            </div>
+            <div>
+              <span class="text-neutral-400 block text-[10px] uppercase">Preferred Activity</span>
+              <span class="font-bold text-white" id="passActivity">Pickleball Social</span>
+            </div>
+            <div>
+              <span class="text-neutral-400 block text-[10px] uppercase">Pass Number</span>
+              <span class="font-mono font-bold text-emerald-400" id="passNumber">#02489</span>
+            </div>
+            <div>
+              <span class="text-neutral-400 block text-[10px] uppercase">Status</span>
+              <span class="font-bold text-amber-400">VIP Priority RSVP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <button onclick="goToHome()" class="w-full py-3.5 rounded-full bg-[#C85A32] hover:bg-[#B34C27] text-white text-sm font-bold shadow-md transition">
+            Back to Kindred Home
+          </button>
+          <p class="text-[11px] text-[#8A8478]">Check your inbox for your private calendar invite and cohort details.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full max-w-6xl mx-auto px-6 py-6 border-t border-[#ECE7DE] text-xs text-[#8A8478] flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <span class="text-[#C85A32]">✦</span>
+      <span class="font-bold text-[#191817]">kindred</span>
+      <span>• The 20-Person Intentional Dating Forum</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="javascript:void(0)" onclick="openModal('submissions')" class="hover:text-[#191817] font-semibold underline">Host Dashboard (View RSVPs)</a>
+      <span>© 2026 Kindred Club</span>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+  <div id="modalOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="closeModal()">
+    <div id="modalContent" class="bg-white rounded-3xl max-w-lg w-full p-8 space-y-5 card-shadow border border-[#ECE7DE] relative max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <button onclick="closeModal()" class="absolute top-5 right-5 text-lg text-[#8A8478] hover:text-black">✕</button>
+      <div id="modalBody"></div>
+    </div>
   </div>
 
   <script>
-    let appData = {};
+    let soundEnabled = true;
+    let currentStep = 0;
+    let quizResponses = {};
 
-    async function loadData() {
-      const res = await fetch('/api/data');
-      appData = await res.json();
-      renderPage();
+    const questions = [
+      {
+        id: "grievance",
+        tag: "THE PROBLEM",
+        title: "What is your biggest grievance with modern dating apps?",
+        subtitle: "Pick the one that makes you want to delete your apps the most.",
+        options: [
+          { key: "A", text: "Endless superficial small talk that never leads to a real date." },
+          { key: "B", text: "Judging someone entirely on 5 curated photos and a 2-line bio." },
+          { key: "C", text: "Ghosting, flake culture, and zero accountability." },
+          { key: "D", text: "Awkward high-pressure 1-on-1 first dates across a table." }
+        ]
+      },
+      {
+        id: "activity",
+        tag: "ACTIVITY PREFERENCE",
+        title: "Which group activity would you most look forward to at a 20-person forum?",
+        subtitle: "Shared experiences spark natural chemistry without forced small talk.",
+        options: [
+          { key: "A", text: "🎾 Pickleball Social: High-energy mixed doubles with rotating partners." },
+          { key: "B", text: "🍕 Pizza Making Night: Hands-on cooking stations with paired prep." },
+          { key: "C", text: "🍳 Cooking Cook-Off: Fun team challenge with mystery ingredients." },
+          { key: "D", text: "🍷 Speakeasy Lounge: Deep conversational prompts & cocktails." }
+        ]
+      },
+      {
+        id: "energy",
+        tag: "VIBE CHECK",
+        title: "How do your closest friends describe your energy in social groups?",
+        subtitle: "Helps us balance conversational archetypes across the 10 men and 10 women.",
+        options: [
+          { key: "A", text: "The Witty Sparkplug: Fast banter, storytelling, and high laughs." },
+          { key: "B", text: "The Deep Explorer: Thoughtful questions, sincere curiosity, great listener." },
+          { key: "C", text: "The Warm Harmonizer: Welcoming, inclusive, makes everyone comfortable." },
+          { key: "D", text: "The Playful Instigator: Loves friendly competition, debates, and banter." }
+        ]
+      },
+      {
+        id: "gender",
+        tag: "COHORT SELECTION",
+        title: "Which 10-person cohort are you applying to join?",
+        subtitle: "We maintain an exact 10 Women / 10 Men ratio for every gathering.",
+        options: [
+          { key: "A", text: "👩 Woman Cohort (Seeking Men)" },
+          { key: "B", text: "👨 Man Cohort (Seeking Women)" },
+          { key: "C", text: "✨ Other / Open Cohort" }
+        ]
+      },
+      {
+        id: "contact",
+        tag: "FINAL STEP",
+        title: "Where should we send your Connection Archetype & Pass?",
+        subtitle: "You'll unlock your private pass number and founding membership audit.",
+        isForm: true
+      }
+    ];
+
+    function playBeep(freq = 440, type = 'sine', duration = 0.08) {
+      if (!soundEnabled) return;
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
     }
 
-    function renderPage() {
-      document.getElementById('metaOrganizer').value = appData.organizer || 'Mahalakshmi';
-      document.getElementById('metaTimeline').value = appData.target_timeline || 'September 2026';
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundStatus').innerText = soundEnabled ? 'On' : 'Off';
+      document.getElementById('soundIcon').innerText = soundEnabled ? '🔊' : '🔇';
+      if (soundEnabled) playBeep(580);
+    }
 
-      const tbody = document.getElementById('guestTableBody');
-      tbody.innerHTML = '';
-      let womenConf = 0, menConf = 0;
+    function startQuiz() {
+      playBeep(520);
+      document.getElementById('landingView').classList.add('hidden');
+      document.getElementById('resultView').classList.add('hidden');
+      document.getElementById('quizView').classList.remove('hidden');
+      currentStep = 0;
+      renderQuestion();
+    }
 
-      appData.guest_list.forEach((g, idx) => {
-        if (g.gender === 'Female' && g.rsvp === 'Confirmed') womenConf++;
-        if (g.gender === 'Male' && g.rsvp === 'Confirmed') menConf++;
+    function goToHome() {
+      document.getElementById('quizView').classList.add('hidden');
+      document.getElementById('resultView').classList.add('hidden');
+      document.getElementById('landingView').classList.remove('hidden');
+    }
 
-        const tr = document.createElement('tr');
-        tr.className = idx % 2 === 0 ? 'bg-white hover:bg-slate-50/80' : 'bg-slate-50/40 hover:bg-slate-50';
-        tr.innerHTML = `
-          <td class="py-2.5 px-3 text-center font-bold text-slate-400">${g.id}</td>
-          <td class="py-2.5 px-3">
-            <input type="text" value="${g.name}" onchange="updateGuest(${idx}, 'name', this.value)" class="w-full bg-transparent font-medium text-slate-900 focus:bg-white focus:ring-1 focus:ring-indigo-500 rounded px-1">
-          </td>
-          <td class="py-2.5 px-3 font-semibold ${g.gender === 'Female' ? 'text-pink-600' : 'text-blue-600'}">${g.gender}</td>
-          <td class="py-2.5 px-3">
-            <input type="text" value="${g.connection || ''}" onchange="updateGuest(${idx}, 'connection', this.value)" class="w-full bg-transparent text-slate-600 focus:bg-white focus:ring-1 focus:ring-indigo-500 rounded px-1">
-          </td>
-          <td class="py-2.5 px-3">
-            <input type="text" value="${g.notes || ''}" onchange="updateGuest(${idx}, 'notes', this.value)" class="w-full bg-transparent text-slate-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 rounded px-1">
-          </td>
-          <td class="py-2.5 px-3">
-            <select onchange="updateGuest(${idx}, 'rsvp', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1 border border-slate-200 focus:outline-none ${
-              g.rsvp === 'Confirmed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-            }">
-              <option value="Confirmed" ${g.rsvp === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-              <option value="Invited" ${g.rsvp === 'Invited' ? 'selected' : ''}>Invited</option>
-              <option value="Declined" ${g.rsvp === 'Declined' ? 'selected' : ''}>Declined</option>
-            </select>
-          </td>
+    function renderQuestion() {
+      const q = questions[currentStep];
+      const total = questions.length;
+      
+      document.getElementById('quizStepIndicator').innerText = `Question ${currentStep + 1} of ${total}`;
+      document.getElementById('quizPercent').innerText = `${Math.round(((currentStep + 1) / total) * 100)}% Completed`;
+      document.getElementById('quizProgressBar').style.width = `${((currentStep + 1) / total) * 100}%`;
+
+      const container = document.getElementById('questionContainer');
+
+      if (!q.isForm) {
+        container.innerHTML = `
+          <div class="space-y-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-widest text-[#C85A32] font-mono">${q.tag}</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#191817] leading-snug">${q.title}</h2>
+            <p class="text-xs text-[#6B655B]">${q.subtitle}</p>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            ${q.options.map((opt, i) => `
+              <button onclick="selectOption('${q.id}', '${opt.key}', '${opt.text.replace(/'/g, "\\'")}')" class="quiz-option w-full p-4 sm:p-5 rounded-2xl border border-[#E8E2D8] bg-white text-left flex items-center justify-between gap-4 transition group">
+                <div class="flex items-center gap-3">
+                  <span class="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#E8E2D8] text-xs font-bold text-[#554F45] flex items-center justify-center group-hover:border-[#C85A32] group-hover:text-[#C85A32]">${opt.key}</span>
+                  <span class="text-xs sm:text-sm font-semibold text-[#191817]">${opt.text}</span>
+                </div>
+                <span class="text-xs text-[#C85A32] font-bold opacity-0 group-hover:opacity-100 transition">Select →</span>
+              </button>
+            `).join('')}
+          </div>
         `;
-        tbody.appendChild(tr);
-      });
+      } else {
+        container.innerHTML = `
+          <div class="space-y-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-widest text-[#C85A32] font-mono">${q.tag}</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#191817] leading-snug">${q.title}</h2>
+            <p class="text-xs text-[#6B655B]">${q.subtitle}</p>
+          </div>
 
-      document.getElementById('womenCountBadge').innerText = `${womenConf}/10 Confirmed Women`;
-      document.getElementById('menCountBadge').innerText = `${menConf}/10 Confirmed Men`;
-
-      const actBody = document.getElementById('activityTableBody');
-      actBody.innerHTML = '';
-      appData.activities.forEach((act, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/40';
-        tr.innerHTML = `
-          <td class="py-2.5 px-3 font-bold text-slate-900">${act.name}</td>
-          <td class="py-2.5 px-3 text-slate-600">${act.venue}</td>
-          <td class="py-2.5 px-3 text-slate-600">${act.structure}</td>
-          <td class="py-2.5 px-3 font-semibold text-emerald-700">${act.cost}</td>
-          <td class="py-2.5 px-3 text-emerald-600">${act.pros}</td>
-          <td class="py-2.5 px-3 text-rose-600">${act.cons}</td>
+          <form onsubmit="submitForm(event)" class="space-y-4 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-[#191817] mb-1">Your Full Name</label>
+              <input type="text" id="formName" required placeholder="e.g., Alex Miller" class="w-full px-4 py-3 rounded-xl border border-[#E8E2D8] bg-[#FAF7F2] text-sm focus:outline-none focus:ring-2 focus:ring-[#C85A32] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#191817] mb-1">Email Address (for Invite Pass)</label>
+              <input type="email" id="formEmail" required placeholder="alex@example.com" class="w-full px-4 py-3 rounded-xl border border-[#E8E2D8] bg-[#FAF7F2] text-sm focus:outline-none focus:ring-2 focus:ring-[#C85A32] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#191817] mb-1">Instagram or LinkedIn (Optional / for Vetting)</label>
+              <input type="text" id="formHandle" placeholder="@alex_miller" class="w-full px-4 py-3 rounded-xl border border-[#E8E2D8] bg-[#FAF7F2] text-sm focus:outline-none focus:ring-2 focus:ring-[#C85A32] focus:bg-white">
+            </div>
+            <button type="submit" class="w-full py-4 rounded-full bg-[#191817] hover:bg-black text-white text-sm font-bold shadow-md transition">
+              Reveal My Archetype & Founding Pass →
+            </button>
+          </form>
         `;
-        actBody.appendChild(tr);
-      });
-
-      const checkContainer = document.getElementById('checklistContainer');
-      checkContainer.innerHTML = '';
-      appData.checklist.forEach((item, idx) => {
-        const div = document.createElement('label');
-        div.className = "flex items-start gap-2.5 cursor-pointer hover:bg-white p-2 rounded-lg transition";
-        div.innerHTML = `
-          <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklist(${idx}, this.checked)" class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
-          <span class="${item.checked ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}">${item.text}</span>
-        `;
-        checkContainer.appendChild(div);
-      });
+      }
     }
 
-    function updateGuest(idx, field, val) {
-      appData.guest_list[idx][field] = val;
+    function selectOption(questionId, key, text) {
+      playBeep(650);
+      quizResponses[questionId] = { key, text };
+      if (currentStep < questions.length - 1) {
+        currentStep++;
+        renderQuestion();
+      }
     }
 
-    function toggleChecklist(idx, checked) {
-      appData.checklist[idx].checked = checked;
-      renderPage();
-    }
+    async function submitForm(e) {
+      e.preventDefault();
+      playBeep(880, 'triangle', 0.2);
 
-    async function saveAll() {
-      appData.organizer = document.getElementById('metaOrganizer').value;
-      appData.target_timeline = document.getElementById('metaTimeline').value;
+      const name = document.getElementById('formName').value;
+      const email = document.getElementById('formEmail').value;
+      const handle = document.getElementById('formHandle').value;
 
-      await fetch('/api/data', {
+      quizResponses.name = name;
+      quizResponses.email = email;
+      quizResponses.handle = handle;
+      quizResponses.timestamp = new Date().toISOString();
+
+      const archetypes = [
+        { name: "The Witty Strategist", desc: "You thrive on playful banter, high-energy games, and lively debates." },
+        { name: "The Sincere Alchemist", desc: "You bring warmth and deep curiosity, creating comfortable spaces for real conversation." },
+        { name: "The Playful Instigator", desc: "You love friendly competition and dynamic challenges like pickleball or cooking cook-offs." },
+        { name: "The Cultural Epicurean", desc: "You connect through hands-on creative crafts, culinary tasting, and shared stories." }
+      ];
+      const chosen = archetypes[Math.floor(Math.random() * archetypes.length)];
+      quizResponses.archetype = chosen.name;
+      quizResponses.passNumber = "#" + (2480 + Math.floor(Math.random() * 100));
+
+      await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(appData)
+        body: JSON.stringify(quizResponses)
       });
-      alert('All document changes saved successfully!');
-      renderPage();
+
+      document.getElementById('quizView').classList.add('hidden');
+      document.getElementById('resultView').classList.remove('hidden');
+
+      document.getElementById('resultArchetype').innerText = chosen.name;
+      document.getElementById('resultDesc').innerText = chosen.desc;
+      document.getElementById('passHolderName').innerText = name;
+      document.getElementById('passNumber').innerText = quizResponses.passNumber;
+
+      const actText = quizResponses.activity ? quizResponses.activity.text.split(':')[0] : 'Pickleball Social';
+      document.getElementById('passActivity').innerText = actText;
     }
 
-    loadData();
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !document.getElementById('landingView').classList.contains('hidden')) {
+        startQuiz();
+      }
+    });
+
+    function openModal(type) {
+      playBeep(480);
+      const modal = document.getElementById('modalOverlay');
+      const body = document.getElementById('modalBody');
+      modal.classList.remove('hidden');
+
+      if (type === 'manifesto') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-[#C85A32] font-mono">OUR MANIFESTO</span>
+            <h2 class="text-2xl font-extrabold text-[#191817]">Death to the Endless Swipe.</h2>
+            <p class="text-xs text-[#6B655B] leading-relaxed">
+              We believe romance cannot be reduced to algorithmic casino slot machines. When you meet people through shared activities—making pizza, playing pickleball, or debating big ideas—the pressure dissolves and genuine chemistry takes over.
+            </p>
+            <p class="text-xs text-[#6B655B] leading-relaxed">
+              Kindred curates balanced 20-person cohorts (10 women, 10 men) from trusted friend circles so every event is safe, intentional, and unforgettable.
+            </p>
+          </div>
+        `;
+      } else if (type === 'forumPeek') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-[#C85A32] font-mono">FORUM PEEK</span>
+            <h2 class="text-2xl font-extrabold text-[#191817]">How the 20-Person Forum Works</h2>
+            <div class="space-y-3 text-xs text-[#6B655B]">
+              <div class="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D8]">
+                <b class="text-[#191817]">1. Curated 10W / 10M Ratios:</b> Equal gender balance from mutual friend networks.
+              </div>
+              <div class="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D8]">
+                <b class="text-[#191817]">2. Interactive Rotations:</b> Mini-games and station rotations so you naturally interact with everyone.
+              </div>
+              <div class="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D8]">
+                <b class="text-[#191817]">3. Double-Blind Matchmaking:</b> Privately tell the host who you'd like to see again; mutual matches connect post-event with zero awkwardness.
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (type === 'faq') {
+        body.innerHTML = `
+          <div class="space-y-4">
+            <span class="text-xs font-extrabold uppercase tracking-widest text-[#C85A32] font-mono">FAQ</span>
+            <h2 class="text-2xl font-extrabold text-[#191817]">Frequently Asked Questions</h2>
+            <div class="space-y-3 text-xs text-[#6B655B]">
+              <div>
+                <b class="text-[#191817]">How are attendees vetted?</b>
+                <p>Every attendee is either a direct friend or nominated by an existing member to ensure high trust and zero creeps.</p>
+              </div>
+              <div>
+                <b class="text-[#191817]">What is the cost?</b>
+                <p>Events average $25–$40 per person to cover court rentals, pizza ingredients, and drinks.</p>
+              </div>
+              <div>
+                <b class="text-[#191817]">Do I have to be good at sports or cooking?</b>
+                <p>Not at all! Everything is geared towards casual fun and laughs rather than intense competition.</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (type === 'submissions') {
+        fetchSubmissions(body);
+      }
+    }
+
+    async function fetchSubmissions(body) {
+      const res = await fetch('/api/submissions');
+      const data = await res.json();
+      body.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-extrabold text-[#191817]">Host RSVP Tracker (${data.length})</h2>
+            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Live Submissions</span>
+          </div>
+          <div class="max-h-80 overflow-y-auto space-y-2 text-xs">
+            ${data.length === 0 ? '<p class="text-slate-400 italic">No quiz submissions yet.</p>' : data.map((sub, i) => `
+              <div class="p-3 bg-[#FAF7F2] rounded-xl border border-[#E8E2D8] space-y-1">
+                <div class="flex justify-between font-bold text-[#191817]">
+                  <span>${sub.name || 'Anonymous'} (${sub.gender ? sub.gender.key : '?'})</span>
+                  <span class="font-mono text-[#C85A32]">${sub.passNumber || '#----'}</span>
+                </div>
+                <div class="text-[11px] text-[#6B655B]">${sub.email || ''} • Archetype: <b class="text-[#191817]">${sub.archetype || 'Pending'}</b></div>
+                <div class="text-[10px] text-[#8A8478]">Activity: ${sub.activity ? sub.activity.text.slice(0, 40) : 'None'}...</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.add('hidden');
+    }
   </script>
 </body>
 </html>
 """
 
 
-class ForumRequestHandler(http.server.BaseHTTPRequestHandler):
+class KindredRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def log_message(self, format, *args):
         pass
@@ -493,10 +592,10 @@ class ForumRequestHandler(http.server.BaseHTTPRequestHandler):
         if parsed.path == "/" or parsed.path == "/index.html":
             self._set_headers("text/html; charset=utf-8")
             self.wfile.write(HTML_PAGE.encode("utf-8"))
-        elif parsed.path == "/api/data":
-            data = load_data()
+        elif parsed.path == "/api/submissions":
+            subs = load_submissions()
             self._set_headers("application/json")
-            self.wfile.write(json.dumps(data).encode("utf-8"))
+            self.wfile.write(json.dumps(subs).encode("utf-8"))
         else:
             self.send_error(HTTPStatus.NOT_FOUND)
 
@@ -505,12 +604,14 @@ class ForumRequestHandler(http.server.BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(length) if length > 0 else b"{}"
 
-        if parsed.path == "/api/data":
+        if parsed.path == "/api/submit":
             try:
-                new_data = json.loads(post_data.decode("utf-8"))
-                save_data(new_data)
+                new_sub = json.loads(post_data.decode("utf-8"))
+                subs = load_submissions()
+                subs.append(new_sub)
+                save_submissions(subs)
                 self._set_headers("application/json")
-                self.wfile.write(json.dumps({"status": "ok"}).encode("utf-8"))
+                self.wfile.write(json.dumps({"status": "saved"}).encode("utf-8"))
             except Exception as e:
                 self.send_error(HTTPStatus.BAD_REQUEST, str(e))
         else:
@@ -519,11 +620,11 @@ class ForumRequestHandler(http.server.BaseHTTPRequestHandler):
 
 def run_server():
     socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), ForumRequestHandler) as httpd:
+    with socketserver.TCPServer(("", PORT), KindredRequestHandler) as httpd:
         print("=" * 60)
-        print(f"🎉 Exclusive Dating Forum Planning App running at:")
-        print(f"👉 http://localhost:{PORT}")
-        print("=" * 60)
+        print(f"✨ Kindred Anti-Swiping Platform running at:")
+        print(f"👉 http://localhost:\{PORT\}")
+        print("\=" * 60)
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
