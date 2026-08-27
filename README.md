@@ -1,32 +1,16 @@
-# Exclusive Dating Forum – Planning & Event Framework
+# ✧ Exclusive Dating Forum & Vibe Questionnaire
 
-A curated, activity-driven framework for hosting an exclusive 20-person dating event (10 women and 10 men).
-
-## 💡 The Core Premise
-
-Traditional dating events and apps often feel high-pressure and unnatural. This project outlines a structure for gathering a trusted circle of 20 friends (10 women, 10 men) and curating interactive, collaborative activities to facilitate organic conversations in a relaxed environment.
+A modern, interactive web application and questionnaire for the exclusive dating forum.
 
 ---
 
-## 🎾 Activity Formats
+## 🚀 How to Run
 
-* **Pickleball Social:** High-energy round-robin doubles with partner rotations across rounds.
-* **Make Pizza Together:** Hands-on cooking stations with paired prep and a shared meal.
-* **Cooking Competition:** Small team cook-off with mystery ingredients and friendly judging.
+### 1. Prerequisites
+Make sure you have **Python 3** installed (comes pre-installed on macOS and Linux).
 
----
+### 2. Launch the Application
+Open your terminal, navigate to this folder, and run:
 
-## 📁 Repository Structure
-
-* `PLANNING.md` – Core planning doc, activity details, guest list tracker, and decisions checklist.
-* `GUEST_LIST_TEMPLATE.csv` – CSV template to track the 10 women and 10 men invitees.
-
----
-
-## 📋 Planning Checklist
-
-- [ ] **Activity:** Select the inaugural event (Pickleball vs. Pizza vs. Cook-off).
-- [ ] **Date & Venue:** Pick target date, time, and location/court/kitchen rental.
-- [ ] **Guest List:** Finalize initial 10 women + 10 men (plus 2–3 alternates each).
-- [ ] **Budget:** Determine cost per person (venue, food, drinks) and split method.
-- [ ] **Post-Event:** Decide follow-up method (host-facilitated mutual match check-in vs. shared group chat).
+```bash
+python3 app.py
